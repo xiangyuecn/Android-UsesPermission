@@ -1,8 +1,11 @@
 package ecomm.lib_comm.permission.test;
 
 import android.Manifest;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.TextView;
@@ -21,36 +24,53 @@ public class MainActivity extends AppCompatActivity {
         setTitle("权限测试");
 
         final TextView text= findViewById(R.id.textView);
-        text.setText("点上面按钮测试");
+        text.setText("点那几个按钮进行测试");
 
         findViewById(R.id.button1).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                run(1);
+                run(1, "默认方式未：直接弹出授权请求，用户如果点了拒绝（非永久），后续还会弹一次提示，防止误点。如果有被永久拒绝的权限，会弹提示，转到系统设置。");
             }
         });
         findViewById(R.id.button2).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                run(2);
+                run(2, "不管什么时候都会弹");
             }
         });
         findViewById(R.id.button3).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                run(3);
+                run(3, "相对月默认方式，如果用户点了拒绝（非永久），本方式不会再次弹提示。");
             }
         });
         findViewById(R.id.button4).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                run(4);
+                run(4, "包含了两个没有在Manifest中声明的权限，其他和默认相同。");
             }
         });
         findViewById(R.id.button5).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                run(5);
+                run(5, "不弹任何提示，直接发起授权请求，如果是被永久禁止的权限，将不会进行处理（不含带自定义授权请求的权限）");
+            }
+        });
+
+        findViewById(R.id.button11).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                text.setText("shouldShowRequestPermissionRationale权限提示模式测试：先重置(装)app，然后点击这个按钮查看结果，然后点默认按钮对相机权限进行控制，然后再点这个按钮，对比检测到的结果。我们需要对比初次安装时的权限状态，非永久性的拒绝一次相机状态，和永久禁用相机权限时的状态；留意是否出现不在询问选项。另外可手动去设置定位权限，对比一下结果");
+
+                String item=Permission.CAMERA;
+                text.append("\n\n【"+Permission.QueryName(item)+"】:");
+                text.append("\n是否授权："+(ContextCompat.checkSelfPermission(MainActivity.this, item) == PackageManager.PERMISSION_GRANTED));
+                text.append("\n需要提示："+ ActivityCompat.shouldShowRequestPermissionRationale(MainActivity.this, item));
+
+                item=Permission.ACCESS_FINE_LOCATION;
+                text.append("\n\n【"+Permission.QueryName(item)+"】:");
+                text.append("\n是否授权："+(ContextCompat.checkSelfPermission(MainActivity.this, item) == PackageManager.PERMISSION_GRANTED));
+                text.append("\n需要提示："+ ActivityCompat.shouldShowRequestPermissionRationale(MainActivity.this, item));
             }
         });
     }
@@ -71,7 +91,7 @@ public class MainActivity extends AppCompatActivity {
 
 
 
-    public void run(final int idx){
+    public void run(final int idx, String desc){
         final TextView text= findViewById(R.id.textView);
 
         ArrayList<String> permissions=new ArrayList<>();
@@ -85,7 +105,7 @@ public class MainActivity extends AppCompatActivity {
         );
 
         if(idx==4){
-            permissions.set(1,Manifest.permission.READ_SMS);
+            permissions.set(0,Manifest.permission.READ_SMS);
             permissions.set(1,"abcdef");
         }else if(idx==5){
             //这两个特殊的 不包括在可以静默处理的权限内 不参与省的弹框
@@ -96,7 +116,8 @@ public class MainActivity extends AppCompatActivity {
 
         text.setText("");
         text.append(System.currentTimeMillis()+" 按钮"+idx);
-        text.append("\n\n申请的权限："+join(permissions));
+        text.append("\n【说明】"+desc);
+        text.append("\n\n【申请权限】："+join(permissions));
 
 
 
@@ -105,7 +126,7 @@ public class MainActivity extends AppCompatActivity {
         String[] arr=permissions.toArray(new String[0]);
         new UsesPermission(MainActivity.this, arr){
             @Override
-            protected String onCancelTips(int viewCancelCount, @NonNull ArrayList<String> rejectFinalPermissions, @NonNull ArrayList<String> rejectPermissions) {
+            protected String onCancelTips(int viewCancelCount, @NonNull ArrayList<String> permissions, boolean isFinal) {
                 if(idx==2){
                     if(viewCancelCount<=3){
                         return "永远弹，剩余"+(3-viewCancelCount+1)+"次取消。{Auto}";
@@ -113,19 +134,20 @@ public class MainActivity extends AppCompatActivity {
                     return null;
                 }
 
-                return super.onCancelTips(viewCancelCount, rejectFinalPermissions, rejectPermissions);
+                return super.onCancelTips(viewCancelCount, permissions, isFinal);
             }
 
-            @Override
-            protected String onTips(int viewTipsCount, @NonNull ArrayList<String> rejectFinalPermissions, @NonNull ArrayList<String> rejectPermissions) {
-                String tips=super.onTips(viewTipsCount, rejectFinalPermissions, rejectPermissions);
 
+            @Override
+            protected String onTips(int viewTipsCount, @NonNull ArrayList<String> permissions, boolean isFinal) {
                 if(idx==2){
-                    return "永远弹"+(viewTipsCount==0?"（这是第一次引导，没取消按钮）":"")+"，权限：[{Names}]";
+                    return "永远弹"+(viewTipsCount==0?"（这是引导）":"")+"，权限：[{Names}]";
                 }
                 if(idx==3){
-                    if(viewTipsCount==1){
-                        return "被拒绝了，弹一次：[{Names}]";
+                    if(viewTipsCount==1 && isFinal){
+                        return "";
+                    }else{
+                        return null;
                     }
                 }
                 if(idx==5){
@@ -133,7 +155,7 @@ public class MainActivity extends AppCompatActivity {
                     return null;
                 }
 
-                return tips;
+                return super.onTips(viewTipsCount, permissions, isFinal);
             }
 
 

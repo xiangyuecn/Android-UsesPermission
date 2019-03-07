@@ -18,7 +18,7 @@ public class InstallPackagesHandle extends Handle {
             if(obj.GetActivity().getPackageManager().canRequestPackageInstalls()){
                 return Handle.CheckResult.Resolve;
             }else{
-                return Handle.CheckResult.FinalRejectHandle;
+                return Handle.CheckResult.FinalReject;
             }
         }else{
             return Handle.CheckResult.Resolve;

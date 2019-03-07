@@ -18,7 +18,7 @@ public class AlertWindowHandle extends Handle {
             if(android.provider.Settings.canDrawOverlays(obj.GetActivity())){
                 return Handle.CheckResult.Resolve;
             }else{
-                return Handle.CheckResult.FinalRejectHandle;
+                return CheckResult.FinalReject;
             }
         }else{
             return Handle.CheckResult.Resolve;

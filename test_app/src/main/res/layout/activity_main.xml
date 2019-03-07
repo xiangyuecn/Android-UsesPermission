@@ -11,7 +11,27 @@
         android:orientation="horizontal"
         android:gravity="center"
         >
+        <Button
+            android:id="@+id/button11"
+            style="@style/Widget.AppCompat.Button.Small"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="11权限提示模式测试" />
+    </LinearLayout>
 
+    <TextView
+        android:id="@+id/textView"
+        android:layout_width="match_parent"
+        android:layout_height="0px"
+        android:layout_weight="1"
+        android:text="TextView" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="60px"
+        android:orientation="horizontal"
+        android:gravity="center"
+        >
         <Button
             android:id="@+id/button1"
             style="@style/Widget.AppCompat.Button.Small"
@@ -32,7 +52,7 @@
             style="@style/Widget.AppCompat.Button.Small"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="3拒绝后弹一次" />
+            android:text="3拒绝不弹" />
 
         <Button
             android:id="@+id/button4"
@@ -48,10 +68,4 @@
             android:layout_height="wrap_content"
             android:text="5静默" />
     </LinearLayout>
-
-    <TextView
-        android:id="@+id/textView"
-        android:layout_width="match_parent"
-        android:layout_height="640dp"
-        android:text="TextView" />
 </LinearLayout>

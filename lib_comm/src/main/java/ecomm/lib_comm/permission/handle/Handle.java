@@ -23,34 +23,22 @@ public abstract class Handle {
         /**
          * 已授权
          */
-        Resolve(false, true, true, false),
+        Resolve(true, false),
         /**
-         * 授权被拒绝，后续请求授权时采用默认的授权设置方式
+         * 授权被拒绝
          */
-        RejectDefault(false, false, true, false),
+        Reject(false, false),
         /**
-         * 授权被永久拒绝，后续请求授权时采用默认的授权设置方式
+         * 授权被永久拒绝
          */
-        FinalRejectDefault(true, false, true, false),
-        /**
-         * 授权被拒绝，后续请求授权时采用权限自己的单独处理方式
-         */
-        RejectHandle(false,false,false,true),
-        /**
-         * 授权被永久拒绝，后续请求授权时采用权限自己的单独处理方式
-         */
-        FinalRejectHandle(true,false,false,true);
+        FinalReject(false, true);
 
 
         public final boolean IsFinalReject;
-        public final boolean CheckIsResolve;
-        public final boolean RequestIsDefault;
-        public final boolean RequestIsHandle;
-        CheckResult(boolean isFinalReject, boolean checkIsResolve, boolean requestIsDefault, boolean requestIsHandle){
+        public final boolean IsResolve;
+        CheckResult(boolean isResolve, boolean isFinalReject){
+            IsResolve=isResolve;
             IsFinalReject=isFinalReject;
-            CheckIsResolve=checkIsResolve;
-            RequestIsDefault=requestIsDefault;
-            RequestIsHandle=requestIsHandle;
         }
     }
 }

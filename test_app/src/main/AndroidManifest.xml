@@ -6,6 +6,7 @@ package="ecomm.lib_comm.permission.test">
 <uses-permission android:name="android.permission.VIBRATE" />
 <uses-permission android:name="android.permission.CAMERA"/>
 <uses-permission android:name="android.permission.RECORD_AUDIO"/>
+<uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
 <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES"/>
 <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW"/>
 

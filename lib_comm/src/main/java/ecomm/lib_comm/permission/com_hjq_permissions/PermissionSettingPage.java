@@ -9,6 +9,8 @@ import android.net.Uri;
 import android.os.Build;
 import android.provider.Settings;
 
+//TODO 定期任务 权限设置数据需要定期从XXPermissions检查更新
+
 /**
  *    author : Android 轮子哥
  *    github : https://github.com/getActivity/XXPermissions
