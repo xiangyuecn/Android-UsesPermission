@@ -14,6 +14,8 @@ import ecomm.lib_comm.permission.handle.InstallPackagesHandle;
  *    github : https://github.com/getActivity/XXPermissions
  *    time   : 2018/06/15
  *    desc   : 权限请求实体类
+ *
+ *    use github: https://github.com/xiangyuecn/Android-UsesPermission
  */
 public class Permission {
     static public class Item{

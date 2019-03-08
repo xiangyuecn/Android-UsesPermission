@@ -9,6 +9,7 @@ import ecomm.lib_comm.permission.view.Settings;
 
 /**
  * 检测是否有悬浮窗权限，和实现了授权申请方法
+ * github: https://github.com/xiangyuecn/Android-UsesPermission
  */
 public class AlertWindowHandle extends Handle {
 

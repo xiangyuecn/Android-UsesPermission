@@ -13,7 +13,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 
@@ -23,6 +22,7 @@ import ecomm.lib_comm.permission.view.Settings;
 
 /**
  * 用户授权处理类，无需实现此抽象类，哪里要用哪里就直接new，简单明了
+ * github: https://github.com/xiangyuecn/Android-UsesPermission
  */
 public abstract class UsesPermission {
     /**

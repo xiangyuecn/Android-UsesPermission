@@ -2,6 +2,9 @@ package ecomm.lib_comm.permission;
 
 import java.util.ArrayList;
 
+/**
+ *  github: https://github.com/xiangyuecn/Android-UsesPermission
+ */
 public final class Permission extends ecomm.lib_comm.permission.com_hjq_permissions.Permission {
 
     /**

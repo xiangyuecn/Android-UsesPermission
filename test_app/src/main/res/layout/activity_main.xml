@@ -7,7 +7,7 @@
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="60px"
+        android:layout_height="40dp"
         android:orientation="horizontal"
         android:gravity="center"
         >
@@ -22,13 +22,13 @@
     <TextView
         android:id="@+id/textView"
         android:layout_width="match_parent"
-        android:layout_height="0px"
+        android:layout_height="0dp"
         android:layout_weight="1"
         android:text="TextView" />
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="60px"
+        android:layout_height="40dp"
         android:orientation="horizontal"
         android:gravity="center"
         >

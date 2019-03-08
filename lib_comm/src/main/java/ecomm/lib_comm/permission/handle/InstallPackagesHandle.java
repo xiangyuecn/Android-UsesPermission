@@ -9,6 +9,7 @@ import ecomm.lib_comm.permission.view.Settings;
 
 /**
  * 检测是否有安装权限，和实现了授权申请方法
+ * github: https://github.com/xiangyuecn/Android-UsesPermission
  */
 public class InstallPackagesHandle extends Handle {
 

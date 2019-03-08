@@ -11,6 +11,9 @@ import android.support.annotation.Nullable;
 
 import ecomm.lib_comm.permission.com_hjq_permissions.PermissionSettingPage;
 
+/**
+ *  github: https://github.com/xiangyuecn/Android-UsesPermission
+ */
 public class Settings extends Fragment {
     public interface OpenSettingsCallback{
         void onResult();

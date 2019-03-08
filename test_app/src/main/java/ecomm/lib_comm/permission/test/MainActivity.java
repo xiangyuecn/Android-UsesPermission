@@ -15,6 +15,9 @@ import java.util.Collections;
 import ecomm.lib_comm.permission.Permission;
 import ecomm.lib_comm.permission.UsesPermission;
 
+/**
+ *  github: https://github.com/xiangyuecn/Android-UsesPermission
+ */
 public class MainActivity extends AppCompatActivity {
 
     @Override

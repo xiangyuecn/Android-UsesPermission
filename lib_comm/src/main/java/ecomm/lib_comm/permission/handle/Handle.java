@@ -2,6 +2,9 @@ package ecomm.lib_comm.permission.handle;
 
 import ecomm.lib_comm.permission.UsesPermission;
 
+/**
+ *  github: https://github.com/xiangyuecn/Android-UsesPermission
+ */
 public abstract class Handle {
     public interface RequestCallback{
         void onResult();

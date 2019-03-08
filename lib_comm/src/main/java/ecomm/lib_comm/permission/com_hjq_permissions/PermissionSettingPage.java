@@ -16,6 +16,8 @@ import android.provider.Settings;
  *    github : https://github.com/getActivity/XXPermissions
  *    time   : 2018/07/18
  *    desc   : 权限设置页（兼容大部分国产手机）
+ *
+ *    use github: https://github.com/xiangyuecn/Android-UsesPermission
  */
 public class PermissionSettingPage {
 

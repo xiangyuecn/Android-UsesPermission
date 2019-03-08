@@ -8,6 +8,9 @@ import android.support.annotation.NonNull;
 
 import java.util.ArrayList;
 
+/**
+ *  github: https://github.com/xiangyuecn/Android-UsesPermission
+ */
 public class Request extends Fragment {
     public interface RequestPermissionsCallBack{
        void onResult(String[] permissions, int[] grantResults);
