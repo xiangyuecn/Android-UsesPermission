@@ -56,14 +56,15 @@ new UsesPermission(MainActivity.this, Permission.CAMERA, Permission.RECORD_AUDIO
 1. 先直接发起权限申请
     - 普通权限（没永久拒绝的权限）如果被拒绝（非永久拒绝），后续会安排再弹框申请一次(防用户误选)。
     - 如果授权结果有被永久拒绝的，这部分权限会和第二步权限申请一起弹框跳转到App授权系统设置。
-2. 弹一次框处理被永久拒绝的权限(弹一次够了)
+2. 弹一次框处理被永久拒绝的权限(弹一次够了)，跳转到App授权系统设置界面。
 
-可参考重新`onTips`方法修改此行为，做到不弹提示或者多次弹提示授权。
+可参考重写`onTips`方法修改此行为，做到不弹提示或者多次弹提示授权。
 
 
-# :open_book:UsesPermission方法文档
+# :open_book:UsesPermission类文档
 `import ecomm.lib_comm.permission.Permission;`
-这个类对外只有一个构造函数，直接`new`直接调起授权请求。使用过程中只需重写这个类的相应函数来控制授权请求行为。无多余、也不提供控制方法。
+
+这个类对外只有一个构造函数，直接`new`直接调起授权请求。使用过程中只需重写这个类的相应函数来控制授权请求行为。无多余、也不提供对外控制的方法。
 
 ## 构造函数
 ### UsesPermission(activity,permissions,defaultTips="")
@@ -88,7 +89,7 @@ new UsesPermission(MainActivity.this, Permission.CAMERA, Permission.RECORD_AUDIO
 
 `rejectPermissions`：被拒绝的权限列表，空数组代表没有此项。
 
-`invalidPermissions`：未在manifest里声明的权限列表，不会出现在`rejectFinalPermissions`中，空数组代表没有此项。
+`invalidPermissions`：未在`manifest`里声明的权限列表，不会出现在`rejectFinalPermissions`中，空数组代表没有此项。
 
 
 ### void onComplete(resolvePermissions,lowerPermissions,rejectFinalPermissions,rejectPermissions,invalidPermissions)
@@ -103,7 +104,7 @@ new UsesPermission(MainActivity.this, Permission.CAMERA, Permission.RECORD_AUDIO
 
 
 ## 控制类可重写函数
-这些函数都是用来控制授权行为，都提供了默认实现，重写时要注意是否需要调用`super.这个方法`。
+这些函数都是用来控制授权行为，都提供了默认实现。
 
 ### String onTips(viewTipsCount,permissions,isFinal)
 整个类里面最核心，逻辑最复杂的一个方法（虽然默认实现只有3行代码）。此方法控制着整个权限请求的流程，弹不弹提示，尝不尝试重新申请，都是它说了算。
@@ -114,7 +115,7 @@ new UsesPermission(MainActivity.this, Permission.CAMERA, Permission.RECORD_AUDIO
 1. 先直接发起权限申请 `viewTipsCount=0`
       - 普通权限（非永久拒绝）如果被拒绝（非永久拒绝），后续会安排再弹框申请一次(防误选)。
       - 如果结果有被永久拒绝，这部分权限会和后面的永久权限申请一起弹框处理。
-2. 弹一次框处理被永久拒绝的权限(弹一次够了) `viewTipsCount=1+`
+2. 弹一次框处理被永久拒绝的权限(弹一次够了)，跳转到App授权系统设置界面 `viewTipsCount=1+`
 
 ```
 @param viewTipsCount 0-n 是第几次准备弹提示框。
@@ -144,8 +145,9 @@ new UsesPermission(MainActivity.this, Permission.CAMERA, Permission.RECORD_AUDIO
 
 
 
-# :open_book:Permission方法文档
+# :open_book:Permission类文档
 `import ecomm.lib_comm.permission.Permission;`
+
 这个类封装了8.0版本的危险权限列表，并且提供了对应的权限名称映射。
 
 ## 权限列表
@@ -221,6 +223,6 @@ protected String onTips(int viewTipsCount, @NonNull ArrayList<String> permission
 # :star:捐赠
 如果这个库有帮助到您，请 Star 一下。
 
-你也可以选择使用支付宝给我捐赠：
+你也可以选择使用支付宝、微信给我捐赠：
 
 ![](.assets/donate-alipay.png)  ![](.assets/donate-weixin.png)
