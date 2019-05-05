@@ -17,6 +17,14 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="11权限提示模式测试" />
+
+        <Button
+            android:id="@+id/button12"
+            style="@style/Widget.AppCompat.Button.Small"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="12后台服务调用测试" />
+
     </LinearLayout>
 
     <TextView

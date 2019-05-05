@@ -1,6 +1,8 @@
 package ecomm.lib_comm.permission.test;
 
 import android.Manifest;
+import android.app.Activity;
+import android.content.Context;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -57,6 +59,12 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 run(5, "不弹任何提示，直接发起授权请求，如果是被永久禁止的权限，将不会进行处理（不含带自定义授权请求的权限）");
+            }
+        });
+        findViewById(R.id.button12).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                run(12, "模拟不确定Activity存不存在时进行权限处理，比如在后台服务中调用，实际结果为仅仅检测权限是否已授权而已。但可能有Activity时，会尝试调起授权请求用户界面。");
             }
         });
 
@@ -127,7 +135,14 @@ public class MainActivity extends AppCompatActivity {
 
 
         String[] arr=permissions.toArray(new String[0]);
-        new UsesPermission(MainActivity.this, arr){
+        Activity activity=MainActivity.this;
+        Context context=MainActivity.this;
+        if(idx==12){
+            //模拟后台服务，此时没有Activity，仅仅检测权限，不会调起授权请求
+            context=activity.getApplicationContext();
+            activity=null;
+        }
+        new UsesPermission(activity, context, arr){
             @Override
             protected String onCancelTips(int viewCancelCount, @NonNull ArrayList<String> permissions, boolean isFinal) {
                 if(idx==2){

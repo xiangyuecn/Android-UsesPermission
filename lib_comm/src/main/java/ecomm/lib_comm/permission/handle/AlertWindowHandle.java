@@ -16,7 +16,7 @@ public class AlertWindowHandle extends Handle {
     @Override
     public Handle.CheckResult Check(UsesPermission obj, String permission) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            if(android.provider.Settings.canDrawOverlays(obj.GetActivity())){
+            if(android.provider.Settings.canDrawOverlays(obj.GetContext())){
                 return Handle.CheckResult.Resolve;
             }else{
                 return CheckResult.FinalReject;

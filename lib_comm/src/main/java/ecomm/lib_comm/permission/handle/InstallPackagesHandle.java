@@ -16,7 +16,7 @@ public class InstallPackagesHandle extends Handle {
     @Override
     public Handle.CheckResult Check(UsesPermission obj, String permission) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            if(obj.GetActivity().getPackageManager().canRequestPackageInstalls()){
+            if(obj.GetContext().getPackageManager().canRequestPackageInstalls()){
                 return Handle.CheckResult.Resolve;
             }else{
                 return Handle.CheckResult.FinalReject;

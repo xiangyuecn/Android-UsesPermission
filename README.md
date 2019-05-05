@@ -4,11 +4,13 @@
 
 项目用到了[`XXPermissions`](https://github.com/getActivity/XXPermissions)中的权限列表、国产手机权限设置页面跳转列表，借鉴了其中的权限结果`onRequestPermissionsResult`的接收方式。
 
+类库源码在[lib_comm/src/.../permission](lib_comm/src/main/java/ecomm/lib_comm/permission)文件夹中，没几个文件，直接复制到你的程序里面即可使用。
+
 
 ## 特性
 
 1. 一个函数调用处理权限申请的所有问题，被拒绝的权限重复询问，被永久拒绝的权限（记住选择、不再询问）打开App授权系统设置。
-2. 函数式调用，代码简洁明晰，阅读源码不用跳来跳去。
+2. 函数式调用，代码简洁明晰，阅读源码不用跳来跳去；额外支持仅需编写一遍代码，`请求用户权限`和`检测是否授权(不调起用户请求)`共用相同处理逻辑，如在后台服务中，存在`Activity`时会弹请求，不存在时仅仅检测权限。
 3. 明确的授权结果回调，要么有(True)，要么没有(False)。
 4. 默认0界面，调用者无需知道、提供、导入任何界面包括文件，但可深度定制。
 5. 中性，默认非弓虽J式、有回旋余地的对待拒绝权限的场景。
@@ -23,7 +25,7 @@
 
 ## 快速使用
 
-直接复制`lib_comm/src/main/java/ecomm/lib_comm/permission`里面的文件到你的程序里面即可使用。
+直接复制[lib_comm/src/main/java/ecomm/lib_comm/permission](lib_comm/src/main/java/ecomm/lib_comm/permission)里面的文件到你的程序里面即可使用。
 
 ### 示例代码
 ``` java
@@ -53,16 +55,24 @@ new UsesPermission(MainActivity.this, Permission.CAMERA, Permission.RECORD_AUDIO
 
 ### 默认行为逻辑
 
+#### 请求用户权限
+
 1. 先直接发起权限申请
     - 普通权限（没永久拒绝的权限）如果被拒绝（非永久拒绝），后续会安排再弹框申请一次(防用户误选)。
     - 如果授权结果有被永久拒绝的，这部分权限会和第二步权限申请一起弹框跳转到App授权系统设置。
 2. 弹一次框处理被永久拒绝的权限(弹一次够了)，跳转到App授权系统设置界面。
+3. 如果全部已授权，直接回调结果，什么界面也不会弹。
 
-可参考重写`onTips`方法修改此行为，做到不弹提示或者多次弹提示授权。
+可参考重写`onTips`方法修改此行为，做到不弹提示或者多次弹提示授权。请求用户权限必须提供`Activity`。
+
+#### 检测用户权限
+
+- 如果纯粹的想检测一下权限是否授权，调用时只需不提供`Activity`参数即可，检测结果会回调返回（同步的）。
+- 如果提供`Activity`参数，但不确定`Activity`存不存在：`Activity`为`null`时，逻辑同上面这条；`Activity`不为`null`时，逻辑同`请求用户权限`。
 
 
 # :open_book:UsesPermission类文档
-`import ecomm.lib_comm.permission.Permission;`
+`import ecomm.lib_comm.permission.UsesPermission;`
 
 这个类对外只有一个构造函数，直接`new`直接调起授权请求。使用过程中只需重写这个类的相应函数来控制授权请求行为。无多余、也不提供对外控制的方法。
 
@@ -72,6 +82,14 @@ new UsesPermission(MainActivity.this, Permission.CAMERA, Permission.RECORD_AUDIO
 
 请求过程中会根据`onTips`返回的结果来控制提示信息、和授权请求流程，`defaultTips`是`onTips`默认实现使用到的提示信息默认值，默认为""字符串；具体逻辑参考`onTips`。
 
+### UsesPermission(activity,context,permissions,defaultTips="")
+检测用户权限、请求用户权限 共用逻辑的构造函数，对比上面这个构造函数只是多了`context`参数。
+
+如果`activity`为`null`时，`context`可以是`ApplicationContext`等，仅仅检测用户权限，不会发起用户权限请求。明确的传入`null`值即可当做权限检测函数来用。
+
+如果`activity`不为`null`时，实际的执行过程同上面这个构造函数。
+
+本方法的存在的意义在于：权限检测功能是次要的；主要用于 在有界面（`Activity`中调用）、无界面（`Service`之类中调用）中可共用一套代码逻辑（`Activity`可能存在也可能不存在，意思就是可能是`null`），但无需编写重复的代码，即可完成权限处理。不管有没有界面，没有就仅仅检测一下权限就回调了，有就发起用户权限请求，简单粗暴。
 
 
 ## 回调类可重写函数
@@ -83,11 +101,11 @@ new UsesPermission(MainActivity.this, Permission.CAMERA, Permission.RECORD_AUDIO
 `lowerPermissions`：如果是在低版本API上处理不支持的高版本新权限时，会忽略此项权限的检测的检测，默许放行，此时本参数将带上此权限。
 
 ### void onFalse(rejectFinalPermissions,rejectPermissions,invalidPermissions)
-未授权时回调，不管什么情况，True和False肯定有一个会回调
+存在未授权权限时回调，不管什么情况，True和False肯定有一个会回调
 
 `rejectFinalPermissions`：被永久拒绝的权限列表，为`rejectPermissions`的子集，空数组代表没有此项。
 
-`rejectPermissions`：被拒绝的权限列表，空数组代表没有此项。
+`rejectPermissions`：被拒绝的权限列表（空数组代表没有此项，是manifest未声明的权限）；不在这个列表里面的是已经授权了的部分权限，可用`contains`方法来判断。
 
 `invalidPermissions`：未在`manifest`里声明的权限列表，不会出现在`rejectFinalPermissions`中，空数组代表没有此项。
 
@@ -104,7 +122,7 @@ new UsesPermission(MainActivity.this, Permission.CAMERA, Permission.RECORD_AUDIO
 
 
 ## 控制类可重写函数
-这些函数都是用来控制授权行为，都提供了默认实现。
+这些函数都是用来控制授权请求行为（仅仅用作权限检测时无效），都提供了默认实现。
 
 ### String onTips(viewTipsCount,permissions,isFinal)
 整个类里面最核心，逻辑最复杂的一个方法（虽然默认实现只有3行代码）。此方法控制着整个权限请求的流程，弹不弹提示，尝不尝试重新申请，都是它说了算。
@@ -201,6 +219,17 @@ protected String onTips(int viewTipsCount, @NonNull ArrayList<String> permission
 protected String onTips(int viewTipsCount, @NonNull ArrayList<String> permissions, boolean isFinal) {
     return null;
 }
+```
+
+## 仅仅检测是否已授权
+仅仅检测权限是否已授权，只需提供任意`Context`，无需提供`Activity`
+``` java
+Activity activity=null;//可以为null：仅仅检测权限，可以不为null：发起用户权限请求
+Context context=applicationContext;
+
+new UsesPermission(activity, context, Permission.READ_CONTACTS){
+    ......
+};
 ```
 
 ## 自定义提示界面

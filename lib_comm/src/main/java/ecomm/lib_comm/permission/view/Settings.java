@@ -61,15 +61,17 @@ public class Settings extends Fragment {
         if(intent==null){
             intent=PermissionSettingPage.build(ThisActivity);
         }
+
         try {
-            startActivityForResult(intent, 102);
+            startActivityForResult(intent, _RequestCode);
         } catch (Exception ignored) {
             //不管什么情况，什么设置，出问题了，统统跳到系统设置
             intent = PermissionSettingPage.google(ThisActivity);
-            startActivityForResult(intent, 102);
+            startActivityForResult(intent, _RequestCode);
         }
         pageIsView=1;
     }
+    final int _RequestCode=101;
 
 
     int pageIsView=0;
@@ -93,7 +95,7 @@ public class Settings extends Fragment {
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if(resultCode!=102){
+        if(resultCode!=_RequestCode){
             return;
         }
         pageIsView=3;

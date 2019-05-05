@@ -2,6 +2,7 @@ package ecomm.lib_comm.permission;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.pm.PackageManager;
 import android.os.Build;
@@ -25,6 +26,10 @@ import ecomm.lib_comm.permission.view.Settings;
  * github: https://github.com/xiangyuecn/Android-UsesPermission
  */
 public abstract class UsesPermission {
+    static private void LogErr(String msg){
+        android.util.Log.e("用户授权处理",msg);
+    }
+
     /**
      * 传入的权限列表
      */
@@ -33,22 +38,29 @@ public abstract class UsesPermission {
      * 为没有重写{@link #onTips}时提示的默认提示
      */
     protected String DefaultTips;
+    /**
+     * 在完成回调后自动销毁本对象，默认是
+     */
+    protected boolean AutoDestroy=true;
 
     protected Activity ThisActivity;
 
+    protected Context ThisContext;
+
+    /**
+     * 申请权限时才可以使用，检测权限时不一定可用
+     */
     public Activity GetActivity(){
         return ThisActivity;
     }
+    public Context GetContext(){
+        return ThisContext;
+    }
 
 
-
-
-    /**
-     * 授权请求处理类，会自动调用授权请求，完成授权后自动回调相应on方法，如果被拒绝了权限，会根据{@link #onTips}结果来转到系统设置
-     * @param defaultTips 为没有重写{@link #onTips}时的默认值
-     */
-    public UsesPermission(@NonNull Activity activity, @NonNull String[] permissions, String defaultTips){
+    private void init(Activity activity, Context context, String[] permissions, String defaultTips){
         ThisActivity=activity;
+        ThisContext=activity!=null?activity:context;
 
         Permissions=new ArrayList<>();
         Collections.addAll(Permissions, permissions);
@@ -58,12 +70,52 @@ public abstract class UsesPermission {
         run();
     }
 
+
+
+    /**
+     * 授权请求处理类，会自动调用授权请求，完成授权后自动回调相应on方法，如果被拒绝了权限，会根据{@link #onTips}结果来转到系统设置
+     * @param defaultTips 为没有重写{@link #onTips}时的默认值
+     */
+    public UsesPermission(@NonNull Activity activity, @NonNull String[] permissions, String defaultTips){
+        init(activity, null, permissions, defaultTips);
+    }
+
     /**
      * 授权请求处理类，会自动调用授权请求，完成授权后自动回调相应on方法。没有重写{@link #onTips}的情况下，如果永久拒绝了授权会自动提示到系统设置
      */
     public UsesPermission(@NonNull Activity activity,  @NonNull String...permissions){
-        this(activity, permissions, "");
+        init(activity, null, permissions, "");
     }
+
+
+
+
+    /**
+     * 【activity==null时】仅仅查询权限是否已经授予，查询完成后会调用相应的on方法（回调是同步的，不存在异步），没有权限的不会进行任何操作。注意：只能检测有或没有权限，无法检测出是否存在永久拒绝的权限。
+     *
+     * 【activity!=null时】授权请求处理类，会自动调用授权请求，完成授权后自动回调相应on方法，如果被拒绝了权限，会根据{@link #onTips}结果来转到系统设置。
+     *
+     * 只当activity可能传入null 或 为null时（仅仅检测权限） 才可以选择使用本方法，因为activity存在时context参数不会生效，等价于没有context参数的构造函数。
+     *
+     * @param defaultTips 为没有重写{@link #onTips}时的默认值
+     */
+    public UsesPermission(@Nullable Activity activity, @NonNull Context context,  @NonNull String[] permissions, String defaultTips){
+        init(activity, context, permissions, defaultTips);
+    }
+    /**
+     * 【activity==null时】仅仅查询权限是否已经授予，查询完成后会调用相应的on方法（回调是同步的，不存在异步），没有权限的不会进行任何操作。注意：只能检测有或没有权限，无法检测出是否存在永久拒绝的权限。
+     *
+     * 【activity!=null时】授权请求处理类，会自动调用授权请求，完成授权后自动回调相应on方法，如果被拒绝了权限，会根据{@link #onTips}结果来转到系统设置。
+     *
+     * 只当activity可能传入null 或 为null时（仅仅检测权限） 才可以选择使用本方法，因为activity存在时context参数不会生效，等价于没有context参数的构造函数。
+     */
+    public UsesPermission(@Nullable Activity activity, @NonNull Context context,  @NonNull String...permissions){
+        init(activity, context, permissions, "");
+    }
+
+
+
+
 
 
     /**
@@ -263,7 +315,7 @@ public abstract class UsesPermission {
     private void run() {
         if (ManifestPermissions == null) {
             try {
-                ManifestPermissions = Arrays.asList(ThisActivity.getPackageManager().getPackageInfo(ThisActivity.getPackageName(), PackageManager.GET_PERMISSIONS).requestedPermissions);
+                ManifestPermissions = Arrays.asList(ThisContext.getPackageManager().getPackageInfo(ThisContext.getPackageName(), PackageManager.GET_PERMISSIONS).requestedPermissions);
             } catch (Exception e) {
                 //NOOP
             }
@@ -277,6 +329,7 @@ public abstract class UsesPermission {
             //Manifest未声明
             if (!ManifestPermissions.contains(item)) {
                 _invalidPermissions.add(item);
+                LogErr("Manifest未声明权限："+item);
                 continue;
             }
 
@@ -330,10 +383,12 @@ public abstract class UsesPermission {
             }
 
             //默认的权限检查
-            if (ContextCompat.checkSelfPermission(ThisActivity, item) != PackageManager.PERMISSION_GRANTED) {
+            if (ContextCompat.checkSelfPermission(ThisContext, item) != PackageManager.PERMISSION_GRANTED) {
                 //傻傻分不清首次还是被永久禁止，全部先调用一次请求就知道谁裸泳了
-                if(_normalIsCall && !ActivityCompat.shouldShowRequestPermissionRationale(ThisActivity, item)){
-                    finalList.add(item);
+                if(ThisActivity!=null) {
+                    if (_normalIsCall && !ActivityCompat.shouldShowRequestPermissionRationale(ThisActivity, item)) {
+                        finalList.add(item);
+                    }
                 }
 
                 noGrant.add(item);
@@ -352,6 +407,12 @@ public abstract class UsesPermission {
 
         //如果重复进入循环，代表经过多次请求了，立即查询最新的没毛病
         _queryAll(_looperPermissions, handleRequests, finalList, noGrant);
+
+        //******仅仅查询权限******
+        if(ThisActivity==null){
+            __callback(finalList, noGrant);
+            return;
+        }
 
         //******没有需要授权的权限了******
         if(noGrant.size()==0){
@@ -643,5 +704,10 @@ public abstract class UsesPermission {
         }
 
         onComplete(resolves,_lowerPermissions,rejectFinalPermissions, rejectPermissions, _invalidPermissions);
+
+        if(AutoDestroy){
+            ThisActivity=null;
+            ThisContext=null;
+        }
     }
 }
