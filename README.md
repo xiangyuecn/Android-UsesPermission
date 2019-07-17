@@ -18,9 +18,9 @@
 
 ## 演示
 
-可直接编译`test_app`项目进行测试，或者下载`.assets/test_app-debug-xxx.apk`测试安装包。
+可直接编译`test_app`项目进行测试，或者下载`assets/test_app-debug-xxx.apk`测试安装包。
 
-![](.assets/1.gif)
+![](assets/1.gif)
 
 
 ## 快速使用
@@ -254,4 +254,4 @@ new UsesPermission(activity, context, Permission.READ_CONTACTS){
 
 你也可以选择使用支付宝、微信给我捐赠：
 
-![](.assets/donate-alipay.png)  ![](.assets/donate-weixin.png)
+![](assets/donate-alipay.png)  ![](assets/donate-weixin.png)
